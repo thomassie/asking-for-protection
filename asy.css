@@ -461,7 +461,7 @@
 .asy .asy-subhead { font-size: var(--step-0, 1rem); font-weight: 500; margin: 2rem 0 0; }
 .asy .asy-dect-text { margin: 0.4rem 0 0.75rem; max-width: 40rem; }
 .asy .asy-dect svg { display: block; overflow: visible; }
-.asy .asy-dect .asy-dect-area.asy-o4 { stroke: none; }
+.asy .asy-dect .asy-dect-area.asy-o4 { fill: none; stroke: none; }   /* rejected: the empty part, the grid shows through */
 .asy .asy-dect-pos { fill: none; stroke: var(--ink); stroke-width: 1.5px; stroke-linejoin: round; }
 .asy .asy-dect-year { stroke: var(--ink); stroke-width: 2px; }
 .asy .asy-dect text.asy-axis { font-family: var(--font-support); font-size: 10.5px; fill: var(--muted); }

@@ -258,7 +258,7 @@
   const BREAK = '2026-07';          // Eurostat counts registered instead of lodged applications from this month
   const TRANSITION = '2026-06';
   const DEF_WORD = { lodged: 'lodged applications', transition: 'transition month', registered: 'registered applications' };
-  const state = { pulse: 'n', topScope: 'EU27_2020', topScale: 'same', year: null, mapScope: '31', cit: null, decScope: 'EU27_2020', tpMode: 'n', flowYear: null, decYear: null, decCit: 'EXT_EU27_2020', warScope: 'EU27_2020', warScale: 'own' };
+  const state = { pulse: 'n', topScope: 'EU27_2020', topScale: 'own', year: null, mapScope: '31', cit: null, decScope: 'EU27_2020', tpMode: 'n', flowYear: null, decYear: null, decCit: 'EXT_EU27_2020', warScope: 'EU27_2020', warScale: 'own' };
 
   async function getJSON(path) {
     const r = await fetch(BASE + path + '?m=' + Math.floor(Date.now() / 60000), { cache: 'no-cache' });
@@ -637,7 +637,7 @@
   // ---------- the ten largest groups ----------
   function drawTop() {
     fillSeg($('#top-scope'), [['EU27_2020', 'European Union'], ['CH', 'Switzerland'], ['DE', 'Germany']], 'topScope');
-    fillSeg($('#top-scale'), [['same', 'Same scale for all'], ['own', 'Each on its own scale']], 'topScale');
+    fillSeg($('#top-scale'), [['own', 'Each on its own scale'], ['same', 'Same scale for all']], 'topScale');
     const el = $('#panels');
     const tip = el._tip || (el._tip = tooltip(el));
     const render = () => {
@@ -1030,16 +1030,14 @@
       const svg = d3.select(el).html('').append('svg').attr('width', W).attr('height', H).attr('role', 'img')
         .attr('aria-label', `${name}, decided in ${placeShort(g)}: shares of first-instance decisions by outcome, ${yearsAll[0]} to ${yearsAll[yearsAll.length - 1]}`);
       el.appendChild(tip.el);
-      // the stack: refugee status at the bottom, rejected (the empty part) on top, as in the bars
+      // grid first; the stack: refugee status at the bottom, rejected (the empty part, see-through) on top, as in the bars
+      [0, 0.5, 1].forEach((v) => svg.append('line').attr('class', 'asy-gridline').attr('x1', mL).attr('x2', W - mR).attr('y1', yS(v)).attr('y2', yS(v)));
       OUTCOMES.forEach(([k], j) => {
         const lo = (p) => d3.sum(p.sh.slice(0, j)), hi = (p) => d3.sum(p.sh.slice(0, j + 1));
         svg.append('path').attr('class', `asy-o${j + 1} asy-dect-area`)
           .attr('d', d3.area().defined((p) => p.ok).x((p) => x(p.y)).y0((p) => yS(lo(p))).y1((p) => yS(hi(p)))(pts));
       });
-      [0, 0.5, 1].forEach((v) => {
-        svg.append('line').attr('class', 'asy-gridline').attr('x1', mL).attr('x2', W - mR).attr('y1', yS(v)).attr('y2', yS(v));
-        svg.append('text').attr('class', 'asy-axis').attr('x', mL - 6).attr('y', yS(v) + 4).attr('text-anchor', 'end').text(`${v * 100}%`);
-      });
+      [0, 0.5, 1].forEach((v) => svg.append('text').attr('class', 'asy-axis').attr('x', mL - 6).attr('y', yS(v) + 4).attr('text-anchor', 'end').text(`${v * 100}%`));
       // the share granting protection, as a line on the stack's boundary with the rejected part
       svg.append('path').attr('class', 'asy-dect-pos')
         .attr('d', d3.line().defined((p) => p.ok).x((p) => x(p.y)).y((p) => yS(1 - p.sh[3]))(pts));
@@ -1259,19 +1257,18 @@
           const a = Math.max(0, x(new Date(w.y, 0, 1))), b = Math.min(pw, x(new Date(w.y + 1, 0, 1)));
           if (b > a) svg.append('rect').attr('class', 'asy-war').attr('x', a).attr('width', b - a).attr('y', lift + 8).attr('height', B - 8);
         });
-        // event lines behind the data, badges above it
+        // layers, back to front: years at war level, grid, reference lines (events, the 2026 break), data, labels and badges
+        const yD = d3.scaleLinear().domain([0, own ? dMax(ct.rs) : dAll]).nice(3).range([lift + dB, lift + 14]);
+        const yA = d3.scaleLinear().domain([0, own ? aMax(ct.rs) : aAll]).nice(3).range([lift + B, lift + aT]);
+        const dTop = yD.domain()[1], aTop = yA.domain()[1];
+        [[yD, dTop], [yA, aTop]].forEach(([yy, top]) => {
+          svg.append('line').attr('class', 'asy-gridline').attr('x1', 0).attr('x2', pw).attr('y1', yy(top)).attr('y2', yy(top));
+          svg.append('line').attr('class', 'asy-gridline').attr('x1', 0).attr('x2', pw).attr('y1', yy(0)).attr('y2', yy(0));
+        });
         marks.forEach((e) => {
           const by = 9 + e.row * 16;
           svg.append('line').attr('class', 'asy-mk').attr('x1', e.mx).attr('x2', e.mx).attr('y1', by + 7).attr('y2', lift + B);
           if (e.bx !== e.mx) svg.append('line').attr('class', 'asy-mk').attr('x1', e.bx).attr('x2', e.mx).attr('y1', by + 7).attr('y2', by + 7);
-        });
-        const yD = d3.scaleLinear().domain([0, own ? dMax(ct.rs) : dAll]).nice(3).range([lift + dB, lift + 14]);
-        const yA = d3.scaleLinear().domain([0, own ? aMax(ct.rs) : aAll]).nice(3).range([lift + B, lift + aT]);
-        const dTop = yD.domain()[1], aTop = yA.domain()[1];
-        [[yD, dTop, 'deaths'], [yA, aTop, 'applicants']].forEach(([yy, top, word]) => {
-          svg.append('line').attr('class', 'asy-gridline').attr('x1', 0).attr('x2', pw).attr('y1', yy(top)).attr('y2', yy(top));
-          svg.append('line').attr('class', 'asy-gridline').attr('x1', 0).attr('x2', pw).attr('y1', yy(0)).attr('y2', yy(0));
-          svg.append('text').attr('class', 'asy-plabel').attr('x', 0).attr('y', yy(top) - 3).text(`${num(top)} ${word}`);
         });
         const xb = x(parseM(BREAK));
         if (xb <= pw) svg.append('line').attr('class', 'asy-break').attr('x1', xb).attr('x2', xb).attr('y1', lift + aT - 10).attr('y2', lift + B);
@@ -1281,6 +1278,8 @@
         if (pre.length) svg.append('path').attr('class', 'asy-dead asy-dead--prelim').attr('d', area(fin.slice(-1).concat(pre)));
         svg.append('path').attr('class', lineCls(g, ' asy-line--thin'))
           .attr('d', d3.line().defined((r) => r.v != null).x((r) => x(parseM(r.m))).y((r) => yA(r.v))(ct.rs));
+        [[yD, dTop, 'deaths'], [yA, aTop, 'applicants']].forEach(([yy, top, word]) =>
+          svg.append('text').attr('class', 'asy-plabel').attr('x', 0).attr('y', yy(top) - 3).text(`${num(top)} ${word}`));
         svg.append('text').attr('x', 0).attr('y', ph - 1).text(d3.timeFormat('%Y')(t0));
         svg.append('text').attr('x', pw).attr('y', ph - 1).attr('text-anchor', 'end').text(d3.timeFormat('%Y')(t1));
         marks.forEach((e) => {
