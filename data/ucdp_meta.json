@@ -1,5 +1,5 @@
 [
-	{"ds":"ged","v":"26.1","thru":"2025-12","f":"1989-01","fetched":"2026-11-12 08:53","first":"2026-11-12 08:53","n":1,"e":417968,"url":"https://ucdp.uu.se/downloads/ged/ged261-csv.zip"},
-	{"ds":"candidate","v":"26.01.26.09","thru":"2026-09","f":"2026-01","fetched":"2026-11-12 08:53","first":"2026-11-12 08:53","n":1,"e":16633,"url":"https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_01_26_09.csv"},
-	{"ds":"acd","v":"26.1","thru":"2025-12","f":"1946-01","fetched":"2026-11-12 08:53","first":"2026-11-12 08:53","n":1,"e":2816,"url":"https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip"}
+	{"ds":"ged","v":"26.1","thru":"2025-12","f":"1989-01","fetched":"2026-11-12 10:00","first":"2026-11-12 10:00","n":1,"e":417968,"url":"https://ucdp.uu.se/downloads/ged/ged261-csv.zip"},
+	{"ds":"candidate","v":"26.01.26.09","thru":"2026-09","f":"2026-01","fetched":"2026-11-12 10:00","first":"2026-11-12 10:00","n":1,"e":16633,"url":"https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_01_26_09.csv"},
+	{"ds":"acd","v":"26.1","thru":"2025-12","f":"1946-01","fetched":"2026-11-12 10:00","first":"2026-11-12 10:00","n":1,"e":2816,"url":"https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip"}
 ]

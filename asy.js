@@ -112,7 +112,6 @@
     <div class="block__body">
       <div class="filters">
         <div class="asy-slider" id="asy-flow-year"></div>
-        <div class="seg" id="asy-flow-hi" role="group" aria-label="Highlight"></div>
       </div>
       <div class="chart" id="asy-sankey"></div>
       <details class="tableview"><summary>Table: every band</summary><div class="tablewrap" id="asy-flow-table"></div></details>
@@ -259,7 +258,7 @@
   const BREAK = '2026-07';          // Eurostat counts registered instead of lodged applications from this month
   const TRANSITION = '2026-06';
   const DEF_WORD = { lodged: 'lodged applications', transition: 'transition month', registered: 'registered applications' };
-  const state = { pulse: 'n', topScope: 'EU27_2020', topScale: 'same', year: null, flowHi: 'none', mapScope: '31', cit: null, decScope: 'EU27_2020', tpMode: 'n', flowYear: null, decYear: null, decCit: 'EXT_EU27_2020', warScope: 'EU27_2020', warScale: 'own' };
+  const state = { pulse: 'n', topScope: 'EU27_2020', topScale: 'same', year: null, mapScope: '31', cit: null, decScope: 'EU27_2020', tpMode: 'n', flowYear: null, decYear: null, decCit: 'EXT_EU27_2020', warScope: 'EU27_2020', warScale: 'own' };
 
   async function getJSON(path) {
     const r = await fetch(BASE + path + '?m=' + Math.floor(Date.now() / 60000), { cache: 'no-cache' });
@@ -318,7 +317,7 @@
       .on('pointerleave', off);
   }
 
-  const LISTENERS = { pulse: [], topScope: [], topScale: [], year: [], flowHi: [], mapScope: [], cit: [], decScope: [], tpMode: [], flowYear: [], decYear: [], decCit: [], warScope: [], warScale: [] };
+  const LISTENERS = { pulse: [], topScope: [], topScale: [], year: [], mapScope: [], cit: [], decScope: [], tpMode: [], flowYear: [], decYear: [], decCit: [], warScope: [], warScale: [] };
   function fillSeg(el, items, key) {
     el.innerHTML = '';
     items.forEach(([v, label]) => {
@@ -697,7 +696,6 @@
   function drawFlows() {
     const years = YEARS.map((r) => r.y);
     fillSlider($('#flow-year'), years, 'flowYear', 'Year of the flow chart');
-    fillSeg($('#flow-hi'), [['none', 'All countries'], ['CH', 'Highlight Switzerland'], ['DE', 'Highlight Germany']], 'flowHi');
     const el = $('#sankey');
     const tip = el._tip || (el._tip = tooltip(el));
     const render = () => {
@@ -733,15 +731,14 @@
       const xm = (x0 + nodeW + x1) / 2;
       const band = (l) => { const a = x0 + nodeW, h = l.v * k;
         return `M${a},${l.sy}C${xm},${l.sy} ${xm},${l.ty} ${x1},${l.ty}L${x1},${l.ty + h}C${xm},${l.ty + h} ${xm},${l.sy + h} ${a},${l.sy + h}Z`; };
-      const hiCls = (g) => (state.flowHi === g ? ' is-hi' + (g === 'DE' ? ' is-hi--de' : '') : '');   // Switzerland red, Germany blue
       const bands = svg.append('g').selectAll('path').data(links).join('path').attr('d', band)
-        .attr('class', (l) => 'asy-band' + (l.c === 'OTHER' ? ' asy-band--other' : '') + hiCls(l.g));
+        .attr('class', (l) => 'asy-band' + (l.c === 'OTHER' ? ' asy-band--other' : ''));
       const nodesL = svg.append('g').selectAll('g').data(cits).join('g');
       nodesL.append('rect').attr('class', 'asy-node').attr('x', x0).attr('y', (d) => d.y).attr('width', nodeW).attr('height', (d) => Math.max(1, d.h));
       nodesL.append('text').attr('class', 'asy-nodelabel').attr('x', x0 - 6).attr('y', (d) => d.y + d.h / 2 + 4).attr('text-anchor', 'end')
         .html((d) => (narrow ? esc(d.n.replace('All other citizenships', 'All others')) : `${esc(d.n)} <tspan class="asy-v">${num(d.v)}</tspan>`));
       const nodesR = svg.append('g').selectAll('g').data(rights).join('g');
-      nodesR.append('rect').attr('class', (d) => 'asy-node' + hiCls(d.g)).attr('x', x1).attr('y', (d) => d.y).attr('width', nodeW).attr('height', (d) => Math.max(1, d.h));
+      nodesR.append('rect').attr('class', 'asy-node').attr('x', x1).attr('y', (d) => d.y).attr('width', nodeW).attr('height', (d) => Math.max(1, d.h));
       nodesR.append('text').attr('class', 'asy-nodelabel').attr('x', x1 + nodeW + 6).attr('y', (d) => d.y + d.h / 2 + 4)
         .html((d) => (narrow ? esc(d.n.replace('Other countries', 'Others')) : `${esc(d.n)} <tspan class="asy-v">${num(d.v)}</tspan>`));
       const showBand = (ev, l) => {
@@ -781,7 +778,7 @@
           .map((r) => `<tr><td>${esc(r.n)}</td><td>${esc(r.r)}</td><td class="num">${num(r.v)}</td></tr>`).join('') + '</tbody></table>';
     };
     onWidth(el, render);
-    on(['flowYear', 'flowHi'], render);
+    on(['flowYear'], render);
   }
 
   // ---------- where applicants come from ----------
