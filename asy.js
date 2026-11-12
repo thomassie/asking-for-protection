@@ -1306,7 +1306,8 @@
         const fin = ct.rs.filter((r) => r.d != null && !r.p), pre = ct.rs.filter((r) => r.d != null && r.p);
         if (fin.length) svg.append('path').attr('class', 'asy-dead').attr('d', area(fin));
         if (pre.length) svg.append('path').attr('class', 'asy-dead asy-dead--prelim').attr('d', area(fin.slice(-1).concat(pre)));
-        svg.append('path').attr('class', lineCls(g, ' asy-line--thin'))
+        // applicants in ink in every view (EU, Switzerland, Germany): red belongs to the events on these panels
+        svg.append('path').attr('class', 'asy-line asy-line--thin')
           .attr('d', d3.line().defined((r) => r.v != null).x((r) => x(parseM(r.m))).y((r) => yA(r.v))(ct.rs));
         [[yD, dTop, 'deaths'], [yA, aTop, 'applicants']].forEach(([yy, top, word]) =>
           svg.append('text').attr('class', 'asy-plabel').attr('x', 0).attr('y', yy(top) - 3).text(`${num(top)} ${word}`));
@@ -1327,7 +1328,7 @@
         panelHover(svg, pel, ptip, x, pw, lift + 10, lift + B, (m) => {
           const r = ct.rs.find((d) => d.m === m);
           const w = wars.find((d) => String(d.y) === m.slice(0, 4)), em = evs.filter((e) => e.d.slice(0, 7) === m);
-          return r && { y: r.v != null ? yA(r.v) : null, cls: dotCls(g),
+          return r && { y: r.v != null ? yA(r.v) : null, cls: 'asy-dot',
             html: `<div class="tt__meta">${mName(m)}</div><div class="tt__title">${esc(ct.n)}</div>
               <dl class="tt__rows"><div><dt>Deaths in the country (UCDP)</dt><dd>${r.d == null ? 'not yet covered' : deathsWord(r.d)}</dd></div>` +
               (r.d != null && Math.round(r.dl) !== Math.round(r.dh) ? `<div><dt>low to high estimate</dt><dd>${deathsWord(r.dl)} to ${deathsWord(r.dh)}</dd></div>` : '') +
