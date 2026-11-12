@@ -1052,11 +1052,18 @@
         svg.append('text').attr('class', 'asy-axis' + (y === yc ? ' is-on' : '')).attr('x', x(y)).attr('y', H - 6).attr('text-anchor', 'middle').text(y);
       });
       pts.filter((p) => !p.ok && p.r).forEach((p) => svg.append('text').attr('class', 'asy-axis').attr('x', x(p.y)).attr('y', yS(0.5) + 4).attr('text-anchor', 'middle').text('few'));
-      // tooltip: the nearest year
+      // tooltip: the nearest year, marked by a vertical line and a dot on the share granting protection
+      // over the dark layers a thin line needs a paper halo to stay visible
+      const focus = svg.append('g').style('display', 'none');
+      focus.append('line').attr('class', 'asy-focus-halo').attr('y1', mT).attr('y2', H - mB);
+      focus.append('line').attr('class', 'asy-focus').attr('y1', mT).attr('y2', H - mB);
+      const dot = svg.append('circle').attr('class', 'asy-dot').attr('r', 3).style('display', 'none');
       svg.append('rect').attr('class', 'overlay').attr('x', mL).attr('y', mT).attr('width', W - mL - mR).attr('height', H - mT - mB)
         .on('pointermove click', (ev) => {
           const px0 = d3.pointer(ev)[0];
           const p = d3.least(pts, (q) => Math.abs(x(q.y) - px0));
+          focus.style('display', null).selectAll('line').attr('x1', x(p.y)).attr('x2', x(p.y));
+          if (p.ok) dot.style('display', null).attr('cx', x(p.y)).attr('cy', yS(1 - p.sh[3])); else dot.style('display', 'none');
           const [px, py] = d3.pointer(ev, el);
           if (!p.r) { tip.show(`<div class="tt__meta">${p.y} · ${placeShort(g)}</div><div class="tt__title">${esc(name)}</div><p class="tt__note">No first-instance decisions published.</p>`, px, py); return; }
           const r = p.r;
@@ -1065,7 +1072,7 @@
             ${OUTCOMES.map(([k, l]) => `<div><dt>${l}</dt><dd>${num(r[k])} (${pct0(r[k], r.t)})</dd></div>`).join('')}</dl>
             <p class="tt__note">Protection granted: ${pct0(r.pos, r.t)}.${r.p ? ' Includes provisional figures.' : ''}${p.ok ? '' : ` Fewer than ${DEC_MIN} decisions: not drawn.`}</p>`, px, py);
         })
-        .on('pointerleave', () => tip.hide());
+        .on('pointerleave', () => { tip.hide(); focus.style('display', 'none'); dot.style('display', 'none'); });
       // the claim: the share granted in the first and the last year drawn, and the bars' year
       const drawn = pts.filter((p) => p.ok);
       const gr = (p) => pct0(p.r.pos, p.r.t);

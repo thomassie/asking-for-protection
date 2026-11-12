@@ -483,3 +483,4 @@
   .asy .tt__tab--share tbody th { font-size: inherit; }
   .asy .tt__tab--share thead th { font-size: 0.625rem; }
 }
+.asy .asy-focus-halo { stroke: var(--paper); stroke-width: 3px; pointer-events: none; }
