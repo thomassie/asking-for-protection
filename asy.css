@@ -1,0 +1,472 @@
+/* Europe's Divides, Asking for Protection (working title): styles, all scoped under .asy so they cannot touch the
+   host page. The base (layout, type, switches, tooltip, table, footer) is the same as the other pages'; colours
+   come from the host's tokens (--paper, --ink, --muted, --rule, --red, --blue, --link), so the page follows the host's
+   light and dark themes; theme.css defines them for the standalone page. Layout reacts to the width of its own
+   container, not the screen.
+   One meaning per colour on this page: ink = Eurostat's EU total, red = the selection (Switzerland, the
+   citizenship picked on the map, the shading of the world map), blue = Germany, grey = everything else. Red, the
+   site's accent as on its other pages, and blue are for marks and large text only, never body text. */
+.asy { container: asy / inline-size; position: relative; color: var(--ink); }
+/* Embedded (default): the host page provides width and side gutters. */
+.asy:not(.asy--standalone) .wrap { max-width: none; margin-inline: 0; padding-left: 0; padding-right: 0; }
+.asy:not(.asy--standalone) .masthead { padding-top: 0; }
+/* Shield from the host's global element styles (zero-specificity :where, so every rule below still wins). */
+.asy :where(h1, h2, h3, h4, p, ul, ol, li, dl, dt, dd, figure, blockquote, table, th, td, summary, label, select, button, span, b, em, small) {
+  color: inherit; font-family: inherit; letter-spacing: normal; text-transform: none; text-shadow: none; }
+.asy :where(a) { color: var(--link); text-decoration: underline; text-decoration-style: solid; }
+
+/* Layout: soft Bauhaus. An asymmetric two-column grid: a narrow rail carries each section's
+   heading and explanation, a wide field carries the chart. One column under 760px.
+   Colours come only from theme.css tokens. Type follows the main website: Helvetica/Arial for
+   headings, reading text and italic quotations; Google Sans Code for navigation and supporting
+   information (labels, axes, notes, figures in tables). */
+.asy {
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-support: "Google Sans Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --on-yellow: #2D3238;          /* text on the yellow fill, same in both themes */
+  --radius: 0;
+  --gap: clamp(1.5rem, 4vw, 3rem);
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3125rem;
+  --step-2: clamp(1.5rem, 3vw, 1.875rem);
+  --step-3: clamp(2.5rem, 7vw, 4.5rem);
+  --hero: clamp(4rem, 14vw, 8.5rem);
+  --max: 1160px;
+}
+.asy *, .asy *::before, .asy *::after { box-sizing: border-box; }
+.asy [hidden] { display: none !important; }
+.asy {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.asy .wrap {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.asy h1, .asy h2, .asy h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.1; margin: 0; text-wrap: balance; }
+.asy p { margin: 0; }
+.asy a { text-underline-offset: 0.18em; }
+.asy em, .asy q, .asy blockquote { font-family: var(--font-body); font-style: italic; }
+.asy blockquote { margin: 0; padding-left: 1.25rem; border-left: 3px solid var(--yellow); font-size: var(--step-1); line-height: 1.45; }
+.asy .eyebrow {
+  font-family: var(--font-support);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* Title full stop: a drawn circle (Helvetica's full stop is square). Sits on the baseline. */
+/* An inline graphic, not an empty box: every engine puts its bottom edge on the text baseline. */
+.asy .title-dot { display: inline-block; width: 0.15em; height: 0.15em; margin: 0 0 0 0.06em; padding: 0; vertical-align: baseline; overflow: visible; }
+.asy .title-dot circle { fill: var(--red); }
+/* ---------- Masthead ---------- */
+.asy .masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--gap);
+  align-items: end;
+  padding-block: clamp(2.5rem, 7vw, 5rem) 0;
+}
+.asy .masthead__text { display: grid; gap: 1.25rem; max-width: 46rem; min-width: 0; }
+.asy .masthead h1 { font-size: var(--step-3); letter-spacing: -0.02em; }
+.asy .lede { font-size: var(--step-1); line-height: 1.45; max-width: 38rem; }
+
+/* ---------- Sections ---------- */
+.asy .block {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--gap);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.asy .block__rail { display: grid; gap: 0.875rem; align-content: start; min-width: 0; }
+.asy .block__rail h2 { font-size: var(--step-2); }
+.asy .block__rail p { color: var(--muted); max-width: 26rem; }
+.asy .block__body { display: grid; gap: 1.25rem; min-width: 0; align-content: start; }
+.asy .note { font-family: var(--font-support); font-size: var(--step--1); color: var(--muted); }
+/* ---------- Charts ---------- */
+.asy .chart { position: relative; width: 100%; min-width: 0; }
+.asy .chart svg { display: block; overflow: visible; }
+.asy .chart text { font-family: var(--font-support); font-size: 11.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.asy .chart .grid line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+.asy .chart .grid line.mid { stroke: var(--muted); stroke-opacity: 0.55; }
+
+.asy .chart .axis-title { font-family: var(--font-support); font-size: 12px; fill: var(--ink); }
+
+.asy .focus-ring { fill: none; stroke: var(--ink); stroke-width: 2px; pointer-events: none; }
+.asy .overlay { fill: transparent; }
+.asy .overlay:focus { outline: none; }
+.asy .overlay:focus-visible { stroke: var(--link); stroke-width: 2px; }
+.asy .tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  width: max-content;
+  max-width: min(18rem, calc(100% - 8px));
+  padding: 0.75rem 0.875rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.asy .tooltip[hidden] { display: none; }
+.asy .tt__meta { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }
+.asy .tt__title { font-weight: 500; margin: 0.2rem 0 0.5rem; }
+.asy .tt__rows { display: grid; gap: 0.2rem; margin: 0; }
+.asy .tt__rows div { display: flex; justify-content: space-between; gap: 1rem; }
+.asy .tt__rows dt { font-family: var(--font-support); font-size: 0.8125rem; display: flex; align-items: center; gap: 0.45rem; color: var(--muted); }
+.asy .tt__rows dd { margin: 0; font-family: var(--font-support); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+
+/* ---------- Filters & legend ---------- */
+.asy .filters { display: grid; gap: 0.5rem; }
+/* Switches ("bar index"): plain labels on a thin rule, a thick ink bar under the selected one.
+   Ink and paper only, so they never borrow the charts' colours or shapes. The rule runs the full
+   width of the column: a background repeating every 44px (the buttons' fixed height), so each
+   wrapped row on a phone gets its own full-width rule too. The bars are inset shadows, so nothing
+   shifts when the selection moves (Google Sans Code keeps its width at weight 500). */
+.asy .seg {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  background: repeating-linear-gradient(to bottom, transparent 0 43px, var(--rule) 43px 44px);
+}
+.asy .seg button {
+  font: inherit;
+  font-family: var(--font-support);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 0.875rem;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.asy .seg button:hover { color: var(--ink); box-shadow: inset 0 -4px 0 var(--rule); }
+.asy .seg button[aria-pressed="true"] { color: var(--ink); font-weight: 500; box-shadow: inset 0 -4px 0 var(--ink); }
+.asy .seg button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (forced-colors: active) {
+  .asy .seg { background: none; }
+  .asy .seg button { border-bottom: 1px solid CanvasText; box-shadow: none; }
+  .asy .seg button[aria-pressed="true"] { border-bottom-width: 4px; }
+}
+.asy .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-family: var(--font-support); font-size: 0.875rem; }
+.asy .legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
+.asy .legend .count { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.asy .summary { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); }
+.asy .summary strong { color: var(--ink); font-weight: 500; }
+/* ---------- Table view ---------- */
+.asy .tableview summary { font-family: var(--font-support); font-size: 0.9375rem; cursor: pointer; color: var(--link); width: max-content; max-width: 100%; }
+.asy .tableview summary:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 0; }
+.asy .tablewrap { overflow-x: auto; max-height: 28rem; overflow-y: auto; margin-top: 0.75rem; border: 1px solid var(--rule); border-radius: 0; }
+.asy table { border-collapse: collapse; width: 100%; font-size: 0.875rem; }
+.asy th, .asy td { text-align: left; padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.asy th { position: sticky; top: 0; background: var(--paper); font-family: var(--font-support); font-size: 0.8125rem; font-weight: 500; white-space: nowrap; }
+.asy td.num, .asy th.num { text-align: right; font-family: var(--font-support); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.asy td.date { font-family: var(--font-support); white-space: nowrap; }
+
+/* ---------- Footer ---------- */
+.asy .foot { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--gap); padding-block: clamp(2.5rem, 6vw, 4rem); }
+.asy .foot h2 { font-size: var(--step-1); }
+.asy .foot ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; color: var(--muted); max-width: 44rem; }
+.asy .glossary { padding-bottom: 0; }
+.asy .glossary dl { margin: 0; display: grid; gap: 0.35rem 0; max-width: 44rem; }
+.asy .glossary dt { font-weight: 500; color: var(--ink); margin-top: 0.85rem; }
+.asy .glossary dt:first-child { margin-top: 0; }
+.asy .glossary dd { margin: 0; color: var(--muted); }
+.asy .glossary dd ul { margin: 0.4rem 0; }
+.asy .glossary b { font-weight: 500; color: var(--ink); }
+.asy .foot .credit { font-family: var(--font-support); margin-top: 1.25rem; font-size: var(--step--1); color: var(--muted); }
+.asy .error { padding: 1rem 1.25rem; border-radius: var(--radius); border: 1px solid var(--red); }
+
+/* Hero: two figures side by side */
+.asy .hero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.asy .hero__switch { grid-column: 1 / -1; display: grid; gap: 0.4rem; min-width: 0; }
+.asy .hero__pov { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.asy .hero__item { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
+.asy .hero__label { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+.asy .hero__figure { font-family: var(--font-body); font-weight: 500; font-size: clamp(3.25rem, 10vw, 6.5rem); line-height: 0.9; letter-spacing: -0.03em; }
+.asy .hero__figure small { font-size: 0.45em; letter-spacing: 0; margin-left: 0.04em; }
+.asy .hero__text { font-size: var(--step-1); line-height: 1.45; max-width: 28rem; }
+/* tooltip table: region next to its country */
+.asy .tooltip { max-width: min(20rem, calc(100% - 8px)); }
+.asy .tt__tab { border-collapse: collapse; width: 100%; font-family: var(--font-support); font-size: 0.8125rem; }
+.asy .tt__tab th, .asy .tt__tab td { padding: 0.12rem 0 0.12rem 0.9rem; border: 0; text-align: right; font-weight: 400; position: static; background: none; white-space: nowrap; }
+.asy .tt__tab th:first-child { padding-left: 0; text-align: left; color: var(--muted); white-space: normal; }
+.asy .tt__tab thead th { font-size: 0.75rem; color: var(--muted); padding-bottom: 0.25rem; max-width: 7rem; overflow: hidden; text-overflow: ellipsis; }
+.asy .tt__tab td { font-variant-numeric: tabular-nums; }
+.asy .tt__tab td + td { color: var(--muted); }
+.asy .tt__tab .tt__sub th, .asy .tt__tab .tt__sub td { font-size: 0.75rem; color: var(--muted); }
+.asy .tt__note { margin-top: 0.45rem; font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }
+@container asy (max-width: 760px) {
+  .asy .masthead { grid-template-columns: minmax(0, 1fr); }
+  .asy .block, .asy .foot { grid-template-columns: minmax(0, 1fr); }
+  .asy .seg button { padding: 0 0.6rem; }
+}
+@container asy (max-width: 520px) {
+  .asy .hero { grid-template-columns: minmax(0, 1fr); }
+}
+/* the wide region table scrolls inside its frame instead of widening the column */
+.asy .block__body > * { min-width: 0; }
+
+/* ---------- This page ---------- */
+.asy .asy-key { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.asy .asy-key > span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.asy .asy-sw { display: inline-block; width: 12px; height: 12px; flex: none; border-radius: 0; }
+.asy .asy-sw--eu { background: var(--ink); }
+.asy .asy-sw--ch { background: var(--red); border-radius: 50%; }
+.asy .asy-sw--break { width: 0; height: 14px; border-left: 1.5px dashed var(--muted); background: none; }
+.asy .asy-sw--none { background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); }
+.asy .asy-sw--rep { background: color-mix(in srgb, var(--muted) 45%, var(--paper)); }
+.asy .asy-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink); }
+.asy .asy-ln--ch { border-top-color: var(--red); }
+.asy .chart .axis path, .asy .chart .axis line { stroke: var(--rule); }
+
+/* lines */
+.asy .asy-line { fill: none; stroke: var(--ink); stroke-width: 1.75px; stroke-linejoin: round; }
+.asy .asy-line--ch { stroke: var(--red); stroke-width: 2px; }
+.asy .asy-line--thin { stroke-width: 1.25px; }
+.asy .asy-break { stroke: var(--muted); stroke-width: 1.25px; stroke-dasharray: 3 3; }
+.asy .asy-transition { fill: var(--rule); fill-opacity: 0.6; }
+.asy .asy-dot { fill: var(--ink); stroke: var(--paper); stroke-width: 1px; }
+.asy .chart text.asy-label { fill: var(--ink); font-size: 11.5px; paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.asy .asy-focus { stroke: var(--muted); stroke-width: 1px; pointer-events: none; }
+
+/* the hook */
+.asy .asy-spark { width: 100%; max-width: 22rem; }
+.asy .asy-spark svg { display: block; overflow: visible; }
+.asy .asy-spark text { font-family: var(--font-support); font-size: 10.5px; fill: var(--muted); }
+
+/* small multiples */
+.asy .asy-panelgrid { display: grid; gap: 1.5rem 18px; position: relative; }
+.asy .asy-panel { min-width: 0; }
+.asy .asy-panel__name { font-weight: 500; overflow-wrap: anywhere; }
+.asy .asy-panel__sub { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); margin-bottom: 0.25rem; }
+.asy .asy-panel svg { display: block; overflow: visible; }
+.asy .asy-panel text { font-family: var(--font-support); font-size: 10.5px; fill: var(--muted); }
+.asy .asy-panel .grid line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+
+/* years: a slider. One ink rule, a red dot as the handle (red = the selection, as everywhere on the page), a short tick and a label under each year; the chosen year's label
+   in ink and weight 500. The handle's centre sits 6px in from each end, so the ticks run from 6px to 100% - 6px. */
+.asy .asy-slider { position: relative; width: 100%; min-width: 0; padding-bottom: 1.5rem; }
+.asy .asy-slider input[type="range"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 32px;
+  margin: 0; padding: 0; background: transparent; cursor: pointer; touch-action: pan-y; }
+.asy .asy-slider input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--ink); border: 0; }
+.asy .asy-slider input[type="range"]::-moz-range-track { height: 2px; background: var(--ink); border: 0; }
+.asy .asy-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px;
+  margin-top: -5px; background: var(--red); border: 0; border-radius: 50%; box-shadow: none; }
+.asy .asy-slider input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; background: var(--red); border: 0; border-radius: 50%;
+  box-shadow: none; }
+.asy .asy-slider input[type="range"]:focus { outline: none; }
+.asy .asy-slider:has(input:focus-visible) { outline: 2px solid var(--link); outline-offset: 4px; }
+.asy .asy-slider__ticks { position: absolute; left: 6px; right: 6px; top: 21px; height: 1.5rem; pointer-events: none; }
+.asy .asy-slider__tick { position: absolute; top: 0; transform: translateX(-50%); padding-top: 9px; font-family: var(--font-support);
+  font-size: 0.8125rem; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.asy .asy-slider__tick::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 5px; background: var(--muted); }
+.asy .asy-slider__tick:first-child { transform: translateX(-6px); }
+.asy .asy-slider__tick:first-child::before { left: 6px; }
+.asy .asy-slider__tick:last-child { transform: translateX(calc(-100% + 6px)); }
+.asy .asy-slider__tick:last-child::before { left: auto; right: 6px; }
+.asy .asy-slider__tick.is-on { color: var(--ink); font-weight: 500; }
+.asy .asy-slider.is-dense .asy-slider__tick:not(:first-child):not(:last-child):not(.is-on) { color: transparent; }
+@media (forced-colors: active) {
+  .asy .asy-slider input[type="range"]::-webkit-slider-runnable-track { background: CanvasText; }
+  .asy .asy-slider input[type="range"]::-webkit-slider-thumb { background: CanvasText; }
+}
+
+/* the flow chart */
+.asy .asy-band { fill: var(--muted); fill-opacity: 0.22; cursor: default; transition: fill-opacity 120ms; }
+.asy .asy-band--other { fill-opacity: 0.1; }
+.asy .asy-band.is-hi { fill: var(--red); fill-opacity: 0.65; }
+.asy .asy-band.is-dim { fill-opacity: 0.07; }
+.asy .asy-band.is-hi.is-dim { fill-opacity: 0.25; }
+.asy .asy-band.is-on { fill: var(--red); fill-opacity: 0.6; }
+.asy .asy-node.is-on { fill: var(--red); }
+.asy .asy-node { fill: var(--ink); }
+.asy .asy-node.is-hi { fill: var(--red); }
+.asy .chart text.asy-nodelabel { fill: var(--ink); font-size: 11.5px; }
+.asy .chart text.asy-nodelabel .asy-v { fill: var(--muted); }
+
+/* the world map */
+.asy .asy-c0 { --c: var(--paper); }
+.asy .asy-c1 { --c: color-mix(in oklab, var(--red) 14%, var(--paper)); }
+.asy .asy-c2 { --c: color-mix(in oklab, var(--red) 30%, var(--paper)); }
+.asy .asy-c3 { --c: color-mix(in oklab, var(--red) 48%, var(--paper)); }
+.asy .asy-c4 { --c: color-mix(in oklab, var(--red) 68%, var(--paper)); }
+.asy .asy-c5 { --c: var(--red); }
+.asy .asy-c6 { --c: color-mix(in oklab, var(--red) 45%, var(--ink)); }
+.asy .asy-rep { --c: color-mix(in srgb, var(--muted) 38%, var(--paper)); }
+.asy .asy-world svg path { fill-rule: evenodd; }
+.asy .asy-sphere { fill: none; stroke: var(--rule); stroke-width: 1px; }
+.asy .asy-country { fill: var(--c); stroke: var(--rule); stroke-width: 0.4px; stroke-linejoin: round; cursor: pointer; }
+.asy .asy-country.asy-c0 { cursor: default; }
+.asy .asy-country.is-sel { stroke: var(--ink); stroke-width: 1.6px; }
+.asy .asy-ramp { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.7rem; font-variant-numeric: tabular-nums; }
+.asy .asy-ramp span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.asy .asy-ramp i { display: inline-block; width: 14px; height: 14px; border-radius: 0; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent); }
+.asy .asy-key .asy-ramp { width: 100%; }
+
+/* find a citizenship: a control on the rule, like the switches */
+.asy .asy-tools { display: flex; flex-wrap: wrap; align-items: stretch; column-gap: 1.5rem;
+  background: repeating-linear-gradient(to bottom, transparent 0 43px, var(--rule) 43px 44px); }
+.asy .asy-find { position: relative; display: flex; align-items: center; gap: 0.55rem; height: 44px; min-width: 0; flex: 0 1 22rem; cursor: text;
+  font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); }
+.asy .asy-find:focus-within { color: var(--ink); box-shadow: inset 0 -4px 0 var(--ink); }
+.asy .asy-find > span { white-space: nowrap; }
+.asy .asy-mag { width: 15px; height: 15px; flex: none; }
+.asy .asy-mag circle, .asy .asy-mag line { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.asy .asy-find input { -webkit-appearance: none; appearance: none; border: 0; border-radius: 0; background: none; margin: 0; padding: 0;
+  font: inherit; font-family: var(--font-body); font-size: 0.9375rem; color: var(--ink); width: 100%; min-width: 5rem; height: 100%; outline: 0; }
+.asy .asy-find input::placeholder { color: var(--muted); opacity: 0.8; }
+.asy .asy-find input::-webkit-search-decoration, .asy .asy-find input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.asy .asy-find input::-webkit-calendar-picker-indicator { display: none !important; }
+@container asy (max-width: 520px) { .asy .asy-find { flex: 1 1 100%; } }
+@media (forced-colors: active) {
+  .asy .asy-tools { background: none; }
+  .asy .asy-find { border-bottom: 1px solid CanvasText; }
+  .asy .asy-find:focus-within { border-bottom-width: 4px; box-shadow: none; }
+}
+
+/* the chosen citizenship */
+.asy .asy-sub { font-size: var(--step-1); margin-top: 0.75rem; }
+.asy .asy-picktext { color: var(--muted); max-width: 44rem; }
+.asy .asy-pick { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.asy .asy-land { fill: var(--paper); stroke: var(--rule); stroke-width: 0.5px; }
+.asy .asy-land--rep { fill: color-mix(in srgb, var(--muted) 38%, var(--paper)); }
+.asy #asy-near .asy-land { fill: color-mix(in srgb, var(--rule) 55%, var(--paper)); }
+.asy #asy-near .asy-land--rep { fill: color-mix(in srgb, var(--muted) 55%, var(--paper)); }
+.asy .asy-bubble { fill: var(--red); fill-opacity: 0.7; stroke: var(--paper); stroke-width: 1px; }
+.asy .asy-hosts { max-height: 24rem; margin-top: 0; }
+.asy .asy-europe { max-width: 640px; }
+.asy .asy-panel .asy-gridline { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+.asy .asy-hero-note { max-width: 22rem; }
+.asy .asy-dot--ch { fill: var(--red); }
+
+/* what happens to an application: the procedure, then outcomes by citizenship */
+.asy .asy-proc { display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr) 28px minmax(0, 1.2fr); align-items: center; gap: 0.6rem 0; margin-bottom: 1.25rem; }
+.asy .asy-step { border: 1px solid var(--rule); padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.875rem; color: var(--muted); background: var(--paper); }
+.asy .asy-step b { color: var(--ink); font-weight: 500; font-size: 0.9375rem; }
+.asy .asy-step code { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }
+.asy .asy-step--key { border: 2px solid var(--ink); }
+.asy .asy-step--apart { grid-column: 1 / -1; border-style: dashed; }
+.asy .asy-branch { display: grid; gap: 0.6rem; }
+.asy .asy-arrow { height: 1px; background: var(--muted); position: relative; margin: 0 4px; }
+.asy .asy-arrow::after { content: ''; position: absolute; right: -1px; top: -4px; border: 4.5px solid transparent; border-left: 7px solid var(--muted); border-right: 0; }
+@container asy (max-width: 760px) {
+  .asy .asy-proc { grid-template-columns: minmax(0, 1fr); }
+  .asy .asy-arrow { width: 1px; height: 18px; margin: 0 auto; }
+  .asy .asy-arrow::after { right: -4px; top: auto; bottom: -1px; border: 4.5px solid transparent; border-top: 7px solid var(--muted); border-bottom: 0; }
+  .asy .asy-step--apart { grid-column: auto; margin-top: 0.4rem; }
+}
+.asy .asy-o1 { fill: var(--ink); background: var(--ink); }
+.asy .asy-o2 { fill: color-mix(in srgb, var(--ink) 62%, var(--paper)); background: color-mix(in srgb, var(--ink) 62%, var(--paper)); }
+.asy .asy-o3 { fill: color-mix(in srgb, var(--ink) 34%, var(--paper)); background: color-mix(in srgb, var(--ink) 34%, var(--paper)); }
+.asy .asy-o4 { fill: var(--paper); stroke: var(--muted); stroke-width: 1px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--muted); }   /* rejected: the empty part of the bar */
+.asy .asy-dec svg { display: block; overflow: visible; }
+.asy .chart text.asy-declabel { fill: var(--ink); font-size: 12px; }
+.asy .chart text.asy-decval { fill: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+.asy .asy-decrow.is-all text { font-weight: 600; }
+.asy .asy-decrow .overlay { fill: transparent; }
+
+/* temporary protection */
+.asy .asy-tpgrid { display: grid; gap: 1rem; }
+.asy .asy-tpgrid.is-side { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.asy .asy-tppanel svg { display: block; overflow: visible; }
+.asy .asy-brk { stroke: var(--ink); stroke-width: 1.5px; }
+.asy .asy-sw--brk { width: 0; height: 14px; border-left: 1.5px solid var(--ink); background: none; }
+
+/* where refugees live (UNHCR): circles for a stock of people, in ink (totals) */
+.asy .asy-stock { fill: var(--ink); fill-opacity: 0.32; stroke: var(--ink); stroke-opacity: 0.7; stroke-width: 0.75px; }
+.asy .asy-sw--stock { border-radius: 50%; background: color-mix(in srgb, var(--ink) 32%, var(--paper)); box-shadow: inset 0 0 0 1px var(--ink); }
+
+.asy .asy-sizes { display: inline-flex; align-items: flex-end; gap: 0.35rem 0.6rem; flex-wrap: wrap; }
+.asy .asy-sizes svg { display: inline-block; vertical-align: bottom; margin-right: 0.25rem; overflow: visible; }
+/* organised violence (UCDP): deaths in grey, never red; preliminary months lighter, preliminary shares dashed */
+.asy .asy-dead { fill: color-mix(in srgb, var(--muted) 55%, var(--paper)); stroke: none; }
+.asy .asy-dead--prelim { fill: color-mix(in srgb, var(--muted) 25%, var(--paper)); }
+.asy .asy-sw--dead { background: color-mix(in srgb, var(--muted) 55%, var(--paper)); }
+.asy .asy-sw--dead.asy-sw--prelim { background: color-mix(in srgb, var(--muted) 25%, var(--paper)); }
+.asy .asy-line--prelim { stroke-dasharray: 4 3; }
+.asy .asy-ln--prelim { border-top-style: dashed; border-top-color: var(--muted); }
+/* Germany: the third place to compare, in the site's blue; red and blue differ by hue only, so its swatch is a
+   diamond (Switzerland's a circle, the EU's a square) and every chart names it in the key and the tooltip */
+.asy .asy-sw--de { background: var(--blue); width: 10px; height: 10px; margin: 1px; transform: rotate(45deg); }
+.asy .asy-ln--de { border-top-color: var(--blue); }
+.asy .asy-line--de { stroke: var(--blue); stroke-width: 2px; }
+.asy .asy-dot--de { fill: var(--blue); }
+.asy .asy-band.is-hi--de { fill: var(--blue); }
+.asy .asy-node.is-hi--de { fill: var(--blue); }
+.asy .asy-band.is-hi--de.is-on, .asy .asy-node.is-hi--de.is-on { fill: var(--red); }   /* hovering stays red, as everywhere */
+/* conflict panels: years at war level (UCDP ACD) behind, numbered events (UN records) above, listed below */
+.asy .asy-war { fill: color-mix(in srgb, var(--muted) 13%, var(--paper)); }
+.asy .asy-sw--war { background: color-mix(in srgb, var(--muted) 13%, var(--paper)); box-shadow: inset 0 0 0 1px var(--rule); }
+.asy .asy-mk { stroke: var(--yellow); stroke-width: 2px; }
+.asy .asy-badge { fill: var(--yellow); stroke: none; }
+.asy .asy-panel text.asy-badge__n { fill: var(--on-yellow); font-size: 9.5px; font-weight: 700; text-anchor: middle; }
+.asy .asy-n { display: inline-block; width: 1.15rem; height: 1.15rem; flex: none; overflow: visible; vertical-align: middle; }
+.asy .asy-n circle { fill: var(--yellow); }
+.asy .asy-n text { fill: var(--on-yellow); font-family: var(--font-support); font-size: 12px; font-weight: 700; }
+.asy .asy-events { margin-top: 0.5rem; }
+.asy .asy-marks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; font-size: 0.875rem; line-height: 1.45; }
+.asy .asy-marks li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr); gap: 0.4rem; align-items: start; }
+.asy .asy-marks .asy-n { margin-top: 1px; }   /* centred on the first line (14px text, line-height 1.45) */
+.asy .asy-marks a { overflow-wrap: anywhere; }
+.asy .asy-when { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.asy .asy-none { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); margin: 0.35rem 0 0; }
+.asy .asy-panel text.asy-plabel { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+/* shield: a host's borders on table cells (the base shield resets type and colour, not borders) */
+.asy :where(table, thead, tbody, tr, th, td) { border: 0; }
+/* Hero: three figures (EU, Switzerland, Germany); three columns where they fit, else two, else one. The figure scales
+   with its column (container units), so six digits and a comma never overflow it. */
+.asy .hero { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.asy .hero__item { position: relative; container-type: inline-size; }
+.asy .hero__figure { font-size: clamp(2.75rem, 27cqi, 6.5rem); }
+.asy .asy-spark .overlay { fill: transparent; cursor: crosshair; }
+/* events are yellow: borderless discs and 2px lines (the site's yellow is pale on white, 1.9:1, so no 1px lines and no
+   text in yellow); the number on yellow is white, in bold (the paper token in the light theme, the near-white ink token
+   in the dark one). White on this yellow is low in contrast; the list under each panel repeats every number. */
+.asy { --on-yellow: var(--paper); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .asy { --on-yellow: var(--ink); } }
+:root[data-theme="dark"] .asy { --on-yellow: var(--ink); }
+.asy .asy-slider.is-dense .asy-slider__tick.is-hide { color: transparent; }
+/* decisions: a bar can be picked (outlined in ink); below, the outcomes over time as a 100% stacked area, the same
+   four shades, the share granting protection as an ink line, the bars' year as a vertical ink line */
+.asy .asy-decrow .overlay { cursor: pointer; }
+.asy .asy-decrow .overlay:focus { outline: none; }
+.asy .asy-decrow .overlay:focus-visible { stroke: var(--link); stroke-width: 2px; }
+.asy .asy-decpick { fill: none; stroke: var(--ink); stroke-width: 2px; }
+.asy .asy-decrow.is-picked text.asy-declabel { font-weight: 600; }
+.asy .asy-subhead { font-size: var(--step-0, 1rem); font-weight: 500; margin: 2rem 0 0; }
+.asy .asy-dect-text { margin: 0.4rem 0 0.75rem; max-width: 40rem; }
+.asy .asy-dect svg { display: block; overflow: visible; }
+.asy .asy-dect .asy-dect-area.asy-o4 { stroke: none; }
+.asy .asy-dect-pos { fill: none; stroke: var(--ink); stroke-width: 1.5px; stroke-linejoin: round; }
+.asy .asy-dect-year { stroke: var(--ink); stroke-width: 2px; }
+.asy .asy-dect text.asy-axis { font-family: var(--font-support); font-size: 10.5px; fill: var(--muted); }
+.asy .asy-dect text.asy-axis.is-on { fill: var(--ink); font-weight: 500; }
+.asy .asy-dect .asy-gridline { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+/* the conflict panels: more room between countries, each with its own events */
+.asy #asy-war-panels { row-gap: 3.25rem; }

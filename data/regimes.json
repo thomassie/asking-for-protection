@@ -1,0 +1,6 @@
+[
+	{"id":"2008","f":"2008-01","t":"2020-12","c":"lodged","b":"Regulation (EC) No 862/2007; Eurostat lists \"January 2008 – December 2014\" and, overlapping, \"January 2014 – December 2020: ... new 2013 Asylum Guidelines\"","url":"https://ec.europa.eu/eurostat/cache/metadata/en/migr_asyapp_esms.htm"},
+	{"id":"2021","f":"2021-01","t":"2026-05","c":"lodged","b":"Regulation (EC) No 862/2007, 2021 Asylum Guidelines","url":"https://ec.europa.eu/eurostat/cache/metadata/en/migr_asyapp_esms.htm"},
+	{"id":"2026-06","f":"2026-06","t":"2026-06","c":"transition","b":"Transition: 2021 Asylum Guidelines and 2026 Asylum Manual","url":"https://ec.europa.eu/eurostat/cache/metadata/en/migr_asyapp_esms.htm"},
+	{"id":"2026-07","f":"2026-07","t":null,"c":"registered","b":"Regulation (EC) No 862/2007, 2026 Asylum Manual (Pact on Migration and Asylum)","url":"https://ec.europa.eu/eurostat/cache/metadata/en/migr_asyapp_esms.htm"}
+]

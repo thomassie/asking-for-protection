@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embed example</title>
+<!-- Stand-in for a host page (e.g. thomassie.me/projects/...): its own tokens, header, a narrow
+     content column, and deliberately unfriendly global styles. The embed must look right anyway. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { margin: 0; font-family: Georgia, serif; }
+  h1, h2, p { margin: 2em 0; color: green; }
+  a { text-decoration: underline wavy; }
+  table, th, td { border: 3px solid green; }
+  button { border-radius: 99px; background: orange; }
+  .site-header { padding: 16px 24px; border-bottom: 1px solid var(--rule); font-family: Helvetica, Arial, sans-serif; }
+  .content { max-width: 720px; margin: 0 auto; padding: 0 16px 64px; }
+</style>
+<link rel="stylesheet" href="asy.css">
+</head>
+<body>
+<header class="site-header">thomassie.me · Projects</header>
+<div class="content">
+  <p style="font-family: Helvetica, Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; font-size: 12px">Europe's Divides</p>
+  <h1>Asking for Protection</h1>
+  <div id="asylum-europe" data-header="false"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="asy.js"></script>
+</body>
+</html>
