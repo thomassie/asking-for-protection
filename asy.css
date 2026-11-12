@@ -423,12 +423,12 @@
 /* conflict panels: years at war level (UCDP ACD) behind, numbered events (UN records) above, listed below */
 .asy .asy-war { fill: color-mix(in srgb, var(--muted) 13%, var(--paper)); }
 .asy .asy-sw--war { background: color-mix(in srgb, var(--muted) 13%, var(--paper)); box-shadow: inset 0 0 0 1px var(--rule); }
-.asy .asy-mk { stroke: var(--yellow); stroke-width: 2px; }
-.asy .asy-badge { fill: var(--yellow); stroke: none; }
-.asy .asy-panel text.asy-badge__n { fill: var(--on-yellow); font-size: 9.5px; font-weight: 700; text-anchor: middle; }
+.asy .asy-mk { stroke: var(--red); stroke-width: 2px; }
+.asy .asy-badge { fill: var(--red); stroke: none; }
+.asy .asy-panel text.asy-badge__n { fill: var(--on-mark); font-size: 9.5px; font-weight: 700; text-anchor: middle; }
 .asy .asy-n { display: inline-block; width: 1.15rem; height: 1.15rem; flex: none; overflow: visible; vertical-align: middle; }
-.asy .asy-n circle { fill: var(--yellow); }
-.asy .asy-n text { fill: var(--on-yellow); font-family: var(--font-support); font-size: 12px; font-weight: 700; }
+.asy .asy-n circle { fill: var(--red); }
+.asy .asy-n text { fill: var(--on-mark); font-family: var(--font-support); font-size: 12px; font-weight: 700; }
 .asy .asy-events { margin-top: 0.5rem; }
 .asy .asy-marks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; font-size: 0.875rem; line-height: 1.45; }
 .asy .asy-marks li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr); gap: 0.4rem; align-items: start; }
@@ -445,12 +445,11 @@
 .asy .hero__item { position: relative; container-type: inline-size; }
 .asy .hero__figure { font-size: clamp(2.75rem, 27cqi, 6.5rem); }
 .asy .asy-spark .overlay { fill: transparent; cursor: crosshair; }
-/* events are yellow: borderless discs and 2px lines (the site's yellow is pale on white, 1.9:1, so no 1px lines and no
-   text in yellow); the number on yellow is white, in bold (the paper token in the light theme, the near-white ink token
-   in the dark one). White on this yellow is low in contrast; the list under each panel repeats every number. */
-.asy { --on-yellow: var(--paper); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .asy { --on-yellow: var(--ink); } }
-:root[data-theme="dark"] .asy { --on-yellow: var(--ink); }
+/* events are red, the site's accent: borderless discs and 2px lines; the number on a disc is white, in bold (the paper
+   token in the light theme, the near-white ink token in the dark one) */
+.asy { --on-mark: var(--paper); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .asy { --on-mark: var(--ink); } }
+:root[data-theme="dark"] .asy { --on-mark: var(--ink); }
 .asy .asy-slider.is-dense .asy-slider__tick.is-hide { color: transparent; }
 /* decisions: a bar can be picked (outlined in ink); below, the outcomes over time as a 100% stacked area, the same
    four shades, the share granting protection as an ink line, the bars' year as a vertical ink line */
@@ -470,3 +469,17 @@
 .asy .asy-dect .asy-gridline { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
 /* the conflict panels: more room between countries, each with its own events */
 .asy #asy-war-panels { row-gap: 3.25rem; }
+/* the share chart's tooltip: a small table, the figures in aligned columns */
+.asy .tooltip.tooltip--wide { max-width: min(25rem, calc(100% - 8px)); }
+.asy .tt__tab--share thead th { text-align: right; max-width: none; }
+.asy .tt__tab--share thead th:first-child { text-align: left; }
+.asy .tt__tab--share tbody th { color: var(--ink); }
+.asy .tt__note b { font-weight: 600; color: var(--ink); }
+.asy .tt__tab--share th, .asy .tt__tab--share td { padding-left: 0.7rem; }
+.asy .tt__tab--share th:first-child { padding-left: 0; }
+@container asy (max-width: 520px) {
+  .asy .tt__tab--share { font-size: 0.6875rem; }
+  .asy .tt__tab--share th, .asy .tt__tab--share td { padding-left: 0.5rem; }
+  .asy .tt__tab--share tbody th { font-size: inherit; }
+  .asy .tt__tab--share thead th { font-size: 0.625rem; }
+}

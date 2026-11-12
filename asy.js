@@ -1092,7 +1092,7 @@
   const UCDP_PAGE = 'https://ucdp.uu.se/downloads/';
   const pc1 = (s) => f1(100 * s) + '%';
   const DEAD_FLOOR = 1000;
-  // an event's number on a yellow disc, drawn in SVG in the list as on the chart: the baseline sits half a digit's
+  // an event's number on a red disc, drawn in SVG in the list as on the chart: the baseline sits half a digit's
   // height below the centre (digits are 0.71 em tall in Google Sans Code), so the number is centred whatever the
   // browser makes of the font's line metrics
   const NUM_DY = '0.355em';
@@ -1134,6 +1134,7 @@
     // the share, both places on one scale (a share of each place's own applicants)
     const el = $('#war-share');
     const tip = el._tip || (el._tip = tooltip(el));
+    tip.el.classList.add('tooltip--wide');                          // a small table: four columns of figures
     $('#war-key').innerHTML = '<span><i class="asy-ln"></i>Applied in the EU</span><span><i class="asy-ln asy-ln--ch"></i>Applied in Switzerland</span><span><i class="asy-ln asy-ln--de"></i>Applied in Germany</span>' +
       (anyPrelim ? '<span><i class="asy-ln asy-ln--prelim"></i>Deaths partly from UCDP&rsquo;s preliminary data</span>' : '') +
       '<span><i class="asy-sw asy-sw--break"></i>July 2026: Eurostat&rsquo;s change of definition</span>';
@@ -1169,18 +1170,33 @@
           const e = eu.find((d) => d.m === m), c = ch.find((d) => d.m === m), dd = de.find((d) => d.m === m);
           if (!e && !c && !dd) { tip.hide(); focus.style('display', 'none'); return; }
           focus.style('display', null).attr('x1', x(parseM(m))).attr('x2', x(parseM(m)));
-          const row = (lab, d) => (d ? `<div><dt>${lab}</dt><dd>${pc1(d.s)} (${num(d.w)} of ${num(d.v)})</dd></div>` : `<div><dt>${lab}</dt><dd>not yet reported</dd></div>`);
-          // which citizenships crossed 1,000 since the month before (the share moves in steps when a large group crosses)
-          const cross = (sr, d) => { const i = sr.indexOf(d), p = i > 0 ? sr[i - 1] : null;
-            if (!d || !p) return '';
-            const inn = (d.cs || []).filter((c) => !(p.cs || []).includes(c)), out = (p.cs || []).filter((c) => !(d.cs || []).includes(c));
-            return [inn.length ? `counted from this month: ${andList(inn.map(citName))}` : '', out.length ? `no longer counted: ${andList(out.map(citName))}` : ''].filter(Boolean).join('; '); };
-          const crosses = [['EU', cross(eu, e)], ['Switzerland', cross(ch, c)], ['Germany', cross(de, dd)]].filter(([, t]) => t);
-          const crossNote = crosses.length ? `<p class="tt__note">${crosses.map(([w, t]) => `${w}, ${t}.`).join(' ')}</p>` : '';
+          // one row per place, figures in columns: the share, the share with UCDP's low estimates, the applicants counted and all
+          const places = [['EU', eu, e], ['Switzerland', ch, c], ['Germany', de, dd]];
+          const row = ([lab, , d]) => (d ? `<tr><th>${lab}</th><td>${pc1(d.s)}</td><td>${pc1(d.sl)}</td><td>${num(d.w)}</td><td>${num(d.v)}</td></tr>`
+            : `<tr><th>${lab}</th><td colspan="4">not yet reported</td></tr>`);
+          // which citizenships crossed 1,000 since the month before (the share moves in steps when a large group crosses),
+          // grouped by citizenship: each with the places where it starts or stops being counted
+          const moves = (dir) => {
+            const at = new Map();
+            places.forEach(([lab, sr, d]) => {
+              const i = sr.indexOf(d), p = i > 0 ? sr[i - 1] : null;
+              if (!d || !p) return;
+              const now = d.cs || [], before = p.cs || [];
+              (dir === 'in' ? now.filter((x) => !before.includes(x)) : before.filter((x) => !now.includes(x)))
+                .forEach((x) => at.set(x, (at.get(x) || []).concat(lab)));
+            });
+            const groups = new Map();
+            [...at].forEach(([x, labs]) => { const k = andList(labs); groups.set(k, (groups.get(k) || []).concat(citName(x))); });
+            return [...groups].sort((a, b) => b[0].length - a[0].length).map(([k, xs]) => `${andList(xs.sort())} (${k})`).join('; ');
+          };
+          const inn = moves('in'), out = moves('out');
           const [px, py] = d3.pointer(ev, el);
           tip.show(`<div class="tt__meta">${mName(m)}${(e || c || dd).p ? ' · deaths partly preliminary' : ''}</div>
-            <dl class="tt__rows">${row('EU', e)}${row('Switzerland', c)}${row('Germany', dd)}</dl>
-            <p class="tt__note">First-time applicants whose citizenship is that of a country with at least 1,000 deaths in the twelve months before (UCDP best estimate). With low estimates: ${[e && 'EU ' + pc1(e.sl), c && 'Switzerland ' + pc1(c.sl), dd && 'Germany ' + pc1(dd.sl)].filter(Boolean).join(', ')}.</p>${crossNote}`, px, py);
+            <table class="tt__tab tt__tab--share"><thead><tr><th></th><th>Share</th><th>Low</th><th>Counted</th><th>Applicants</th></tr></thead>
+            <tbody>${places.map(row).join('')}</tbody></table>
+            <p class="tt__note">Counted: first-time applicants whose citizenship is that of a country with at least 1,000 deaths in the twelve months before (UCDP best estimate). Share: counted, of all applicants; low: the same with UCDP&rsquo;s low estimates.</p>` +
+            (inn ? `<p class="tt__note"><b>Counted from this month:</b> ${inn}.</p>` : '') +
+            (out ? `<p class="tt__note"><b>No longer counted:</b> ${out}.</p>` : ''), px, py);
         })
         .on('pointerleave', () => { tip.hide(); focus.style('display', 'none'); });
     };
