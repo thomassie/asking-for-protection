@@ -484,3 +484,6 @@
   .asy .tt__tab--share thead th { font-size: 0.625rem; }
 }
 .asy .asy-focus-halo { stroke: var(--paper); stroke-width: 3px; pointer-events: none; }
+/* the world map's tooltip: a host's total, the part from neighbouring countries and the largest groups, with shares */
+.asy .tt__tab--host .tt__total th, .asy .tt__tab--host .tt__total td { color: var(--ink); }
+.asy .tt__tab--host .tt__sub th { padding-top: 0.45rem; }

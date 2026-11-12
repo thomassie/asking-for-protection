@@ -62,6 +62,7 @@
       <h2 id="asy-h-near">Most refugees live in neighbouring countries${DOT}</h2>
       <p>Applications are one part of the picture. UNHCR, the UN Refugee Agency, counts the people who have fled their country and live in another at the end of each year: a number of people at one moment, not the applications made during a year.</p>
       <p id="asy-near-text"></p>
+      <p id="asy-near-hosts"></p>
       <p class="note" id="asy-near-note"></p>
     </div>
     <div class="block__body">
@@ -234,7 +235,7 @@
   const f1 = d3.format(',.1f');
   const f2 = d3.format(',.2f');
   const pctOf = (a, b) => (b ? Math.round((100 * a) / b) : null);
-  const share = (a, b) => { const p = (100 * a) / b; return p < 0.05 ? '<0.1%' : f1(p) + '%'; };
+  const share = (a, b) => { const p = (100 * a) / b; return p === 0 ? '0%' : p < 0.05 ? '<0.1%' : p >= 99.95 && a < b ? '>99.9%' : f1(p) + '%'; };
   const rate = (v) => (v == null ? '–' : v >= 10 ? f1(v) : f2(v));
   const parseM = d3.timeParse('%Y-%m');
   const monthName = d3.timeFormat('%B %Y');
@@ -422,6 +423,10 @@
   };
   const crossesBreak = (m0, m1) => m0 < BREAK && m1 >= TRANSITION;
   // the places to compare: Eurostat's EU total (ink), Switzerland (red) and Germany (blue)
+  // UNHCR's country names in running text: without a trailing qualifier, abbreviations written out
+  // ('Iran (Islamic Rep. of)' -> 'Iran', 'Syrian Arab Rep.' -> 'Syrian Arab Republic'), with 'the' where English needs it
+  const unName = (n) => n.replace(/\s*\([^)]*\)$/, '').replace(/\bDem\. /g, 'Democratic ').replace(/\bRep\.(?=\s|$)/g, 'Republic');
+  const theName = (n) => (/\b(Republic|Federation|Kingdom|States|Emirates|Islands)\b|^(Netherlands|Philippines|Gambia|Bahamas|Comoros)$/.test(n) ? 'the ' + n : n);
   const placeName = (g) => (g === 'CH' ? 'Switzerland' : g === 'DE' ? 'Germany' : 'the EU');
   const placeShort = (g) => (g === 'EU27_2020' ? 'EU' : placeName(g));
   const placeMod = (g) => (g === 'CH' ? '--ch' : g === 'DE' ? '--de' : '');
@@ -491,6 +496,7 @@
   function drawNear() {
     const el = $('#near');
     const tip = el._tip || (el._tip = tooltip(el));
+    tip.el.classList.add('tooltip--wide');                          // a small table: people and shares
     const w = UNHCR_WORLD[UNHCR_WORLD.length - 1], year = w.y;
     const hosts = UNHCR_HOSTS.filter((r) => r.y === year);
     const byIso = new Map(WORLD.filter((f) => f.properties.iso3).map((f) => [f.properties.iso3, f]));
@@ -514,10 +520,13 @@
         .attr('cx', (r) => proj(at.get(byIso.get(r.h).id))[0]).attr('cy', (r) => proj(at.get(byIso.get(r.h).id))[1])
         .on('pointermove click', (ev, r) => {
           const [px, py] = d3.pointer(ev, el);
+          const row = (label, v) => `<tr><th>${label}</th><td>${num(v)}</td><td>${share(v, r.v)}</td></tr>`;
           tip.show(`<div class="tt__meta">End of ${year}</div><div class="tt__title">${esc(r.n)}</div>
-            <dl class="tt__rows"><div><dt>Refugees and others in need</dt><dd>${num(r.v)}</dd></div>
-            ${r.ua > 0 ? `<div><dt>of them from Ukraine</dt><dd>${num(r.ua)}</dd></div>` : ''}</dl>` +
-            (r.o && r.o.length ? `<p class="tt__note">Largest groups by origin: ${r.o.map(([n, v]) => `${esc(n)} ${num(+v)}`).join('; ')}.</p>` : ''), px, py);
+            <table class="tt__tab tt__tab--host"><thead><tr><th></th><th>People</th><th>Share</th></tr></thead><tbody>
+            <tr class="tt__total"><th>Refugees and others in need</th><td>${num(r.v)}</td><td></td></tr>
+            ${row('from a neighbouring country', r.nb)}
+            ${r.o && r.o.length ? `<tr class="tt__sub"><th colspan="3">Largest groups by origin</th></tr>` + r.o.map(([n, v]) => row(esc(unName(n)), +v)).join('') : ''}
+            </tbody></table>`, px, py);
         })
         .on('pointerleave', () => tip.hide());
       const sizes = [500000, 1000000, 2500000].filter((v) => v <= max);
@@ -527,21 +536,35 @@
         '<span><i class="asy-sw asy-sw--rep"></i>One of the 31 countries of application</span>';
     };
     onWidth(el, render);
-    // the claims: Europe's share, with and without Ukrainians, and the largest hosts (all from UNHCR's data)
+    // the claim of the heading, from UNHCR's data: the share living in a country that shares a land border with their
+    // own (core.world_border, the map's borders), then the five largest hosts with their largest groups, then Europe
     const top = hosts.slice().sort((a, b) => b.v - a.v).slice(0, 5);
     const pct1 = (a, b) => f1((100 * a) / b);
+    const from = (n) => (n === 'Unknown' ? 'of unknown origin' : n === 'Stateless' ? 'stateless' : `from ${theName(unName(n))}`);
+    const groups = (r) => andList(r.o.filter(([, v], k) => k === 0 || +v >= r.v / 10).map(([n, v]) => `${num(+v)} ${from(n)} (${share(+v, r.v)})`));
+    const near = top.filter((r) => 2 * r.nb > r.v), far = top.filter((r) => 2 * r.nb <= r.v);
+    const COUNT = ['none', 'one', 'two', 'three', 'four'];
+    // the heading's claim holds for the latest year (QA stops the pipeline otherwise)
     $('#near-text').innerHTML = `At the end of ${year}, UNHCR counted ${num(w.v)} refugees and others in need of international protection under its mandate. ` +
-      `The 31 countries hosted ${num(w.e)} of them (${pct1(w.e, w.v)}%), ${num(w.eua)} from Ukraine; without Ukrainians, their share was ${pct1(w.e - w.eua, w.v - w.ua)}%. ` +
-      `The largest hosts: ${top.map((r) => `${esc(r.n)} (${num(r.v)})`).join(', ')}.` +
-      (year === 2025 ? ` UNHCR&rsquo;s <a href="${GT_URL}">Global Trends 2025</a> report puts 65% of refugees in countries neighbouring their own, and 68% of refugees and others in need in low- and middle-income countries.` : '');
+      `Most of them live in a neighbouring country, one that shares a land border with their own: ${num(w.nb)}, or ${pct1(w.nb, w.v)}%.` +
+      (year === 2025 ? ` UNHCR&rsquo;s <a href="${GT_URL}">Global Trends 2025</a> report gives the same share, and puts 68% in low- and middle-income countries.` : '');
+    const hostLine = (r) => `${esc(unName(r.n))} hosts ${num(r.v)}: ${groups(r)}.`;
+    const farLine = (r, k) => (near.length ? (k ? ' Another is ' : ' The exception is ') : ' ') +
+      `${esc(unName(r.n))}, with ${num(r.v)}: ${share(r.nb, r.v)} come from a neighbouring country. Its largest groups: ${groups(r)}.`;
+    $('#near-hosts').innerHTML = (near.length === top.length ? 'In each of the five largest hosts, most people come from a neighbouring country. '
+        : near.length ? `In ${COUNT[near.length]} of the five largest hosts, most people come from a neighbouring country. `
+        : 'In none of the five largest hosts do most people come from a neighbouring country.') +
+      near.map(hostLine).join(' ') + far.map(farLine).join('') +
+      ` The 31 countries hosted ${num(w.e)} of the ${num(w.v)} (${pct1(w.e, w.v)}%).`;
     const off = hosts.filter((r) => !byIso.has(r.h) && r.v > 0).sort((a, b) => b.v - a.v);
     $('#near-note').innerHTML = `Source: UNHCR Refugee Population Statistics Database, end-${year} figures (fetched ${dayOf(w.fetched)}); a number of people at one moment, not applications. ` +
+      'Neighbouring country: one that shares a land border with the country of origin on this map (GISCO Countries 2024, 1:60 million). Shares of a country&rsquo;s largest groups are of all refugees and others in need living there. ' +
       `Not counted here: Palestine refugees under the mandate of UNRWA, and people displaced inside their own country. Asylum-seekers awaiting a decision are a separate count: ${num(w.as)} at the end of ${year}. ` +
-      'The Ukrainians in UNHCR\u2019s figures for the 31 countries are largely the same people as Eurostat\u2019s holders of temporary protection further down: two sources, not two groups, so the figures are not added. ' +
+      'UNHCR\u2019s figures for the 31 countries largely include the holders of temporary protection in Eurostat\u2019s figures further down: two sources, not two groups, so the figures are not added. ' +
       (off.length ? `Hosts without an area on this map: ${off.map((r) => `${esc(r.n)} ${num(r.v)}`).join('; ')}.` : '');
-    $('#near-table').innerHTML = `<table><thead><tr><th>Country where they live</th><th class="num">Refugees and others in need</th><th class="num">of them from Ukraine</th><th class="num">Share of the world</th></tr></thead><tbody>` +
-      hosts.slice().sort((a, b) => b.v - a.v).map((r) => `<tr><td>${esc(r.n)}${r.e ? ' ·' : ''}</td><td class="num">${num(r.v)}</td><td class="num">${num(r.ua)}</td><td class="num">${share(r.v, w.v)}</td></tr>`).join('') +
-      '</tbody></table><p class="note asy-tnote">· = one of the 31 countries of application.</p>';
+    $('#near-table').innerHTML = `<table><thead><tr><th>Country where they live</th><th class="num">Refugees and others in need</th><th class="num">from a neighbouring country</th><th class="num">Share of the world</th></tr></thead><tbody>` +
+      hosts.slice().sort((a, b) => b.v - a.v).map((r) => `<tr><td>${esc(r.n)}${r.e ? ' ·' : ''}</td><td class="num">${num(r.v)}</td><td class="num">${share(r.nb, r.v)}</td><td class="num">${share(r.v, w.v)}</td></tr>`).join('') +
+      '</tbody></table><p class="note asy-tnote">· = one of the 31 countries of application. From a neighbouring country: share of the people living there.</p>';
   }
 
   // ---------- month by month ----------
