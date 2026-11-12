@@ -151,7 +151,7 @@
     <div class="block__rail">
       <h2 id="asy-h-war">Organised violence and applications${DOT}</h2>
       <p>The Uppsala Conflict Data Program (UCDP) counts the people killed in organised violence: fighting between governments and armed groups, fighting between armed groups, and their attacks on civilians. Here these deaths are set beside first-time applications by citizens of the same country. Deaths are counted where they happened, applicants by the citizenship they hold: the two can move together without one explaining the other.</p>
-      <p>For context in time, each panel shades the years in which UCDP counts a war in the country and numbers a few events, each dated by a UN record and listed under the panel with its source. Our selection, by the kinds of event set out in the note.</p>
+      <p>For context in time, each panel shades the years in which UCDP counts a war in the country and numbers a few events, each dated by a UN record and listed under the panel with its source: a selection made for this page, by the kinds of event set out in the note.</p>
       <p id="asy-war-text"></p>
       <p class="note" id="asy-war-note"></p>
     </div>
@@ -219,7 +219,7 @@
   </section>
 
   <section class="foot glossary" aria-labelledby="asy-h-how">
-    <div><h2 id="asy-h-how">How we count${DOT}</h2></div>
+    <div><h2 id="asy-h-how">Method and sources${DOT}</h2></div>
     <div>
       <dl id="asy-glossary"></dl>
       <p class="credit" id="asy-credit"></p>
@@ -254,7 +254,7 @@
   const TP_BREAKS = { '2023-01': 'the Netherlands', '2024-02': 'Bulgaria', '2024-07': 'Germany', '2025-06': 'Italy' };
   const TP_META = 'https://ec.europa.eu/eurostat/cache/metadata/EN/migr_asytp_esms.htm';
   const SEM_URL = 'https://www.admin.ch/de/newnsb/iiAHV0k5TFjK';
-  const PUBLISHED = '2026-11-12';   // the day the page went public (How we count, Changes)
+  const PUBLISHED = '2026-11-12';   // the day the page went public (Method and sources, Changes)
   const BREAK = '2026-07';          // Eurostat counts registered instead of lodged applications from this month
   const TRANSITION = '2026-06';
   const DEF_WORD = { lodged: 'lodged applications', transition: 'transition month', registered: 'registered applications' };
@@ -441,14 +441,14 @@
     const chSame = rowAt('CH', eu.m);
     $('#hero-ch-text').innerHTML = `First-time applicants who are not EU citizens${ch.p ? ' (provisional)' : ''}: ${f1(ch.r)} per 100,000 inhabitants.` +
       (ch.m !== eu.m && chSame ? ` In ${mName(eu.m)}, the latest month with an EU total: ${f1(chSame.r)}, against ${f1(eu.r)} in the EU.` : '');
-    $('#hero-ch-note').textContent = 'Last 24 months.' + (ch.m >= BREAK ? ' Dashed: July 2026, Eurostat\u2019s change of definition (see How we count).' : '');
+    $('#hero-ch-note').textContent = 'Last 24 months.' + (ch.m >= BREAK ? ' Dashed: July 2026, Eurostat\u2019s change of definition (see Method and sources).' : '');
     // Germany, the largest EU country of application, for comparison (blue, as everywhere on the page)
     const de = lastOf('DE'), deSame = rowAt('DE', eu.m);
     $('#hero-de-label').textContent = 'Germany, ' + mName(de.m);
     $('#hero-de').textContent = num(de.v);
     $('#hero-de-text').innerHTML = `First-time applicants who are not EU citizens${de.p ? ' (provisional)' : ''}: ${f1(de.r)} per 100,000 inhabitants.` +
       (de.m !== eu.m && deSame ? ` In ${mName(eu.m)}, the latest month with an EU total: ${f1(deSame.r)}, against ${f1(eu.r)} in the EU.` : '');
-    $('#hero-de-note').textContent = 'Last 24 months.' + (de.m >= BREAK ? ' Dashed: July 2026, Eurostat\u2019s change of definition (see How we count).' : '');
+    $('#hero-de-note').textContent = 'Last 24 months.' + (de.m >= BREAK ? ' Dashed: July 2026, Eurostat\u2019s change of definition (see Method and sources).' : '');
     spark($('#spark-eu'), 'EU27_2020');
     spark($('#spark-ch'), 'CH');
     spark($('#spark-de'), 'DE');
@@ -685,7 +685,7 @@
       $('#top-text').innerHTML = `In ${where}, from ${mName(m0)} to ${mName(m1)}, the largest group was ${esc(lead.n)} (${num(lead.l)}), followed by ${esc(second.n)} (${num(second.l)}). ` +
         `The highest month for any of the ten since 2014: ${esc(peak.n)}, ${num(peak.v)} in ${mName(peak.m)}.`;
       $('#top-note').textContent = (own ? 'Each panel has its own scale (its top line is labelled), so the heights are not comparable between panels. ' : 'All panels share one scale (its top line is labelled). ') +
-        (crossesBreak(m0, m1) ? 'These twelve months include July 2026, when Eurostat\u2019s definition changed (see How we count). ' : '') +
+        (crossesBreak(m0, m1) ? 'These twelve months include July 2026, when Eurostat\u2019s definition changed (see Method and sources). ' : '') +
         'Twelve-month totals are sums of monthly figures, each rounded to the nearest 5.';
     };
     onWidth(el, render);
@@ -1338,18 +1338,18 @@
         (near.length ? ` For ${andList(near.map((c) => esc(c.n)))}, UCDP&rsquo;s low and high estimates lie on either side of 1,000 (${near.map((c) => `${near.length > 1 ? esc(c.n) + ': ' : ''}${num(Math.round(c.lo12))} to ${num(Math.round(c.hi12))}`).join('; ')}).` : '');
       $('#war-note').innerHTML = `Source: UCDP Georeferenced Event Dataset (GED) Global ${esc(ged.v)}, final, to ${mName(ged.thru)}` +
         (cand ? `, and UCDP Candidate Events Dataset ${esc(cand.v)}, ${mName(cand.f)} to ${mName(cand.thru)}: preliminary until UCDP&rsquo;s next yearly release, and marked so (fetched ${dayOf(cand.fetched)})` : '') + '. ' +
-        'Deaths are UCDP&rsquo;s best estimates for all three kinds of organised violence it counts (see How we count). ' +
+        'Deaths are UCDP&rsquo;s best estimates for all three kinds of organised violence it counts (see Method and sources). ' +
         (step ? `The threshold is a line, so the share moves in steps when a large group crosses it. In ${mName(step.m)}, the deaths UCDP counted in ${esc(step.n)} in the twelve months before ${step.up ? 'reached' : 'fell below'} 1,000, and its citizens were ${pc1(step.frac)} of that month&rsquo;s applicants in ${where}. The chart&rsquo;s tooltip names the citizenships that cross. ` : '') +
         (state.warScale === 'own' ? 'On their own scales, the panels&rsquo; deaths start from a top of 1,000 a month, so that a few deaths never fill a panel; every top line is labelled. ' : 'On the same scale, every panel&rsquo;s top line is the highest month of any of the ten. ') +
         'UCDP places events in the Gaza Strip and the West Bank in Israel; here they count for Palestine*, the rest for Israel. ' +
         (acd ? `Shaded on the panels: the calendar years in which UCDP counts at least one armed conflict between a government and another party located in the country as a war, with 1,000 or more battle-related deaths in the year (UCDP/PRIO Armed Conflict Dataset ${esc(acd.v)}, to ${acd.thru.slice(0, 4)}, so the months after have no shading yet); a war between states is located in both. ` : '') +
-        'Numbered on the panels: events of the following kinds, our selection, each dated by a UN record and linked to it. In the country (for a war between states, in either of them): a change in who governs by force, after mass protests or by suspending parliament, or an attempt by force; the start or an escalation of large-scale organised violence, the end of a major battle, or an agreement to end a war; a disaster that struck a large part of the population. ' +
+        'Numbered on the panels: a selection of events of the following kinds, made for this page, each dated by a UN record and linked to it. In the country (for a war between states, in either of them): a change in who governs by force, after mass protests or by suspending parliament, or an attempt by force; the start or an escalation of large-scale organised violence, the end of a major battle, or an agreement to end a war; a disaster that struck a large part of the population. ' +
         'Where the UN record gives only the month, the event is placed in the middle of it. The events say when something happened, not why any one person applied; notes under a panel name what readers might look for that is not an event with a date. ' +
         'Applicants are matched by the citizenship they hold, not by the country they left or lived in. Stateless applicants and those of unknown citizenship count in the total, never as citizens of a country with deaths. ' +
         'The threshold of 1,000 deaths in twelve months is this page&rsquo;s own; UCDP calls an armed conflict between a government and another party a war when its battle-related deaths reach 1,000 in a calendar year, a narrower count. ' +
         'UCDP counts deaths, not persecution or other serious harm; the asylum procedure examines each case on its own (next chapter). ' +
         'Most people who fled the war in Ukraine hold temporary protection (further down), which is not an asylum application. ' +
-        (crossesBreak(a, b) ? 'These twelve months include July 2026, when Eurostat&rsquo;s definition changed (see How we count). ' : '') +
+        (crossesBreak(a, b) ? 'These twelve months include July 2026, when Eurostat&rsquo;s definition changed (see Method and sources). ' : '') +
         footFor(['PS']).trim();
     };
     renderText();
@@ -1445,7 +1445,7 @@
       '</tbody></table><p class="note asy-tnote">b = break in Eurostat’s series.</p>';
   }
 
-  // ---------- how we count ----------
+  // ---------- method and sources ----------
   function drawHow() {
     const ds = new Map(META.map((r) => [r.ds, r]));
     const m = ds.get('migr_asyappctzm'), a = ds.get('migr_asyappctza'), p = ds.get('demo_gind'), dq = ds.get('migr_asydcfstq'), tq = ds.get('migr_asytpsm');
