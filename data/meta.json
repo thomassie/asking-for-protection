@@ -1,7 +1,7 @@
 [
 	{"ds":"demo_gind","upd":"2026-10-27 23:00","fetched":"2026-11-10 19:33","first":"2026-11-10 19:33","n":1,"thru":null,"url":"https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table"},
 	{"ds":"migr_asyappctza","upd":"2026-09-03 11:00","fetched":"2026-11-10 18:40","first":"2026-11-10 18:37","n":33,"thru":"2025","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asyappctza/default/table"},
-	{"ds":"migr_asyappctzm","upd":"2026-11-10 23:00","fetched":"2026-11-11 13:17","first":"2026-11-10 18:16","n":66,"thru":"2026-07-01","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asyappctzm/default/table"},
+	{"ds":"migr_asyappctzm","upd":"2026-11-13 11:00","fetched":"2026-11-13 10:15","first":"2026-11-10 18:16","n":99,"thru":"2026-07-01","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asyappctzm/default/table"},
 	{"ds":"migr_asydcfstq","upd":"2026-11-10 23:00","fetched":"2026-11-11 13:19","first":"2026-11-10 18:40","n":70,"thru":"2025","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asydcfstq/default/table"},
-	{"ds":"migr_asytpsm","upd":"2026-11-10 11:00","fetched":"2026-11-10 19:33","first":"2026-11-10 19:32","n":32,"thru":"2026-09-01","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asytpsm/default/table"}
+	{"ds":"migr_asytpsm","upd":"2026-11-13 23:00","fetched":"2026-11-13 10:18","first":"2026-11-10 19:32","n":64,"thru":"2026-09-01","url":"https://ec.europa.eu/eurostat/databrowser/view/migr_asytpsm/default/table"}
 ]

@@ -28,7 +28,7 @@
 	{"g":"ES","n":"Spain","r":"europe31","eu":true,"o":26,"f":"2010-01","l":"2026-08"},
 	{"g":"SE","n":"Sweden","r":"europe31","eu":true,"o":27,"f":"2008-01","l":"2026-08"},
 	{"g":"IS","n":"Iceland","r":"europe31","eu":false,"o":28,"f":"2015-01","l":"2026-07"},
-	{"g":"LI","n":"Liechtenstein","r":"europe31","eu":false,"o":29,"f":"2016-01","l":"2026-09"},
+	{"g":"LI","n":"Liechtenstein","r":"europe31","eu":false,"o":29,"f":"2016-01","l":"2026-10"},
 	{"g":"NO","n":"Norway","r":"europe31","eu":false,"o":30,"f":"2008-01","l":"2026-10"},
 	{"g":"CH","n":"Switzerland","r":"europe31","eu":false,"o":31,"f":"2008-01","l":"2026-09"},
 	{"g":"ME","n":"Montenegro","r":"apart","eu":false,"o":32,"f":"2018-01","l":"2026-10"}
