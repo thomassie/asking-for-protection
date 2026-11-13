@@ -318,6 +318,10 @@
 .asy .asy-c4 { --c: color-mix(in oklab, var(--red) 68%, var(--paper)); }
 .asy .asy-c5 { --c: var(--red); }
 .asy .asy-c6 { --c: color-mix(in oklab, var(--red) 45%, var(--ink)); }
+/* dark theme: the top class turns towards yellow, not the light ink, so it is brighter than red and stays saturated
+   (mixed with the light ink it faded to pink and read as less); as on the far-right maps */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .asy .asy-c6 { --c: color-mix(in oklab, var(--red) 40%, var(--yellow, var(--red))); } }
+:root[data-theme="dark"] .asy .asy-c6 { --c: color-mix(in oklab, var(--red) 40%, var(--yellow, var(--red))); }
 .asy .asy-rep { --c: color-mix(in srgb, var(--muted) 38%, var(--paper)); }
 .asy .asy-world svg path { fill-rule: evenodd; }
 .asy .asy-sphere { fill: none; stroke: var(--rule); stroke-width: 1px; }
